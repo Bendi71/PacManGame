@@ -2,6 +2,8 @@ import pygame
 from vector import Vector2
 from constants import *
 import numpy as np
+import os
+import sys
 
 class Pellet(object):
     def __init__(self, row, column):
@@ -48,6 +50,15 @@ class PelletGroup(object):
     def update(self, dt):
         for powerpellet in self.powerpellets:
             powerpellet.update(dt)
+    
+    def get_resource_path(self, relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.dirname(__file__)
+        return os.path.join(base_path, relative_path)
                 
     def createPelletList(self, pelletfile):
         data = self.readPelletfile(pelletfile)        
@@ -61,7 +72,7 @@ class PelletGroup(object):
                     self.powerpellets.append(pp)
                     
     def readPelletfile(self, textfile):
-        return np.loadtxt(textfile, dtype='<U1')
+        return np.loadtxt(self.get_resource_path(textfile), dtype='<U1')
     
     def isEmpty(self):
         if len(self.pelletList) == 0:

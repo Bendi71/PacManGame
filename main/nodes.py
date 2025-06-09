@@ -2,6 +2,8 @@ import pygame
 from vector import Vector2
 from constants import *
 import numpy as np
+import os
+import sys
 
 class Node(object):
     def __init__(self, x, y):
@@ -42,8 +44,17 @@ class NodeGroup(object):
         self.connectVertically(data)
         self.homekey = None
 
+    def get_resource_path(self, relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.dirname(__file__)
+        return os.path.join(base_path, relative_path)
+
     def readMazeFile(self, textfile):
-        return np.loadtxt(textfile, dtype='<U1')
+        return np.loadtxt(self.get_resource_path(textfile), dtype='<U1')
     
     def createNodeTable(self, data, xoffset=0, yoffset=0):
         for row in list(range(data.shape[0])):

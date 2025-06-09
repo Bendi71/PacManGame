@@ -1,5 +1,6 @@
 import pygame
 import os
+import sys
 
 class SoundManager:
     def __init__(self):
@@ -7,8 +8,8 @@ class SoundManager:
         # Ensure mixer is initialized
         pygame.mixer.init()
         
-        # Sound file paths (relative to the Pac man directory)
-        sound_dir = os.path.join("..", "sounds")
+        # Get the correct path for sounds
+        sound_dir = self.get_resource_path("sounds")
         
         # Load sound effects
         self.eat_sound = pygame.mixer.Sound(os.path.join(sound_dir, "eat_sound.wav"))
@@ -18,8 +19,7 @@ class SoundManager:
         self.eat_ghost = pygame.mixer.Sound(os.path.join(sound_dir, "pacman_eatghost.wav"))
         self.intro_music = pygame.mixer.Sound(os.path.join(sound_dir, "pacman_beginning.wav"))
         
-        # Set default volumes
-        self.eat_sound.set_volume(0.4)
+        # Set default volumes        self.eat_sound.set_volume(0.4)
         self.power_up.set_volume(0.6)
         self.game_over.set_volume(0.8)
         self.pacman_death.set_volume(0.7)
@@ -28,6 +28,15 @@ class SoundManager:
         
         # Flag to track if intro music is playing
         self.intro_playing = False
+    
+    def get_resource_path(self, relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.dirname(os.path.dirname(__file__))
+        return os.path.join(base_path, relative_path)
     
     def play_eat_sound(self):
         """Play sound for eating a regular pellet"""

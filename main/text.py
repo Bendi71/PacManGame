@@ -1,6 +1,8 @@
 import pygame
 from vector import Vector2
 from constants import *
+import os
+import sys
 
 class Text(object):
     def __init__(self, text, color, x, y, size, time=None, id=None, visible=True):
@@ -14,8 +16,17 @@ class Text(object):
         self.lifespan = time
         self.label = None
         self.destroy = False
-        self.setupFont("PressStart2P-Regular.ttf")
+        self.setupFont(self.get_resource_path("PressStart2P-Regular.ttf"))
         self.createLabel()
+        
+    def get_resource_path(self, relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller """
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.dirname(__file__)
+        return os.path.join(base_path, relative_path)
 
     def setupFont(self, fontpath):
         self.font = pygame.font.Font(fontpath, self.size)
