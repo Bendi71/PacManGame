@@ -35,7 +35,6 @@ class GameController(object):
         self.mazedata = MazeData()
         self.sound_manager = SoundManager()
         self.game_started = False
-        # Start playing intro music
         self.sound_manager.play_intro_music()
 
     def restartGame(self):
@@ -50,6 +49,7 @@ class GameController(object):
         self.textgroup.showText(READYTXT)
         self.lifesprites.resetLives(self.lives)
         self.fruitCaptured = []
+        self.sound_manager.play_intro_music()
 
     def resetLevel(self):
         self.pause.paused = True
@@ -64,6 +64,7 @@ class GameController(object):
         self.pause.paused = True
         self.startGame()
         self.textgroup.updateLevel(self.level)
+        self.sound_manager.play_intro_music()
 
     def setBackground(self):
         self.background_norm = pygame.surface.Surface(SCREENSIZE).convert()
@@ -144,6 +145,8 @@ class GameController(object):
             if event.type == QUIT:
                 exit()
             elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    exit()
                 if event.key == K_SPACE:
                     if self.pacman.alive:
                         self.pause.setPause(playerPaused=True)
@@ -154,6 +157,7 @@ class GameController(object):
                             self.sound_manager.stop_intro_music()
                         else:
                             self.textgroup.showText(PAUSETXT)
+                            self.sound_manager.play_intro_music()
                             self.hideEntities()
 
     def checkGhostEvents(self):

@@ -1,0 +1,69 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+          
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller PacMan.spec
+          
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: PacMan ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          body: |
+            # PacMan Game ${{ github.ref_name }}
+            
+            A classic PacMan clone built with Pygame.
+            
+            ## Controls
+            - Arrow keys: Move Pac-Man
+            - Space: Pause/unpause the game
+            - ESC: Exit the game
+            
+            ## Features
+            - Classic PacMan gameplay with authentic graphics and sounds
+            - Multiple maze levels
+            - Ghost AI with different personalities
+            - Power pellets and fruit bonuses
+            
+            ## Requirements
+            - Windows 10 or newer
+            
+            ## Download
+            - Just download PacMan.exe and run it!
+            
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/PacMan.exe
+          asset_name: PacMan.exe
+          asset_content_type: application/octet-stream
