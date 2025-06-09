@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   release:
     runs-on: windows-latest
@@ -21,19 +24,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pyinstaller
-          
-      - name: Build with PyInstaller
+            - name: Build with PyInstaller
         run: |
           pyinstaller PacMan.spec
           
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release and Upload Asset
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: PacMan ${{ github.ref_name }}
+          name: PacMan ${{ github.ref_name }}
+          files: ./dist/PacMan.exe
           draft: false
           prerelease: false
           body: |
@@ -57,13 +56,3 @@ jobs:
             
             ## Download
             - Just download PacMan.exe and run it!
-            
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/PacMan.exe
-          asset_name: PacMan.exe
-          asset_content_type: application/octet-stream
